@@ -1,0 +1,13 @@
+es_instance_name: "data"
+#es_heap_size: "1g"
+es_config:
+ cluster.name: "tester-cluster"
+ #discovery.zen.ping.unicast.hosts: "{{ master_inventory }}"
+ network.host: 0.0.0.0
+ http.port: 9200
+ transport.tcp.port: 9300
+ node.data: true
+ node.master: false
+ #xpack.monitoring.enabled: true
+ #xpack.monitoring.collection.enabled: true
+ bootstrap.memory_lock: true

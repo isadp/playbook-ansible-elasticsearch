@@ -1,0 +1,6 @@
+es_scripts: false
+es_templates: false
+es_version_lock: false
+#es_plugins: {}
+es_plugins:
+ - plugin: ingest-attachment

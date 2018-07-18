@@ -1,0 +1,18 @@
+- hosts: data4
+  roles:
+    - role: ansible-elasticsearch
+
+  tasks:
+   - debug:
+       msg: "instance_default_file: {{ instance_default_file }}"
+   - debug:
+       msg: "instance_init_script: {{ instance_init_script }}"
+   - debug:
+       msg: "conf_dir: {{ conf_dir }}"
+   - debug:
+       msg: "instance_sysd_script: {{ instance_sysd_script }}"
+   - debug:
+       msg: "log_dir: {{ log_dir }}"
+   - debug:
+       msg: "data_dirs: {{ data_dirs }}"
+   

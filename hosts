@@ -1,0 +1,12 @@
+[es-cluster:children]
+master
+data
+[master]
+ma1 ansible_host=172.16.81.101
+ma2 ansible_host=172.16.81.102
+ma3 ansible_host=172.16.81.103
+[data]
+data1 ansible_host=172.16.81.201
+data2 ansible_host=172.16.81.202
+data3 ansible_host=172.16.81.203
+data4 ansible_host=172.16.81.204
