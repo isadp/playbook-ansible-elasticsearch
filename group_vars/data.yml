@@ -1,5 +1,5 @@
 es_instance_name: "data"
-es_heap_size: "3g"
+#es_heap_size: "3g"
 es_config_extra:
  node.data: true
  node.master: false
