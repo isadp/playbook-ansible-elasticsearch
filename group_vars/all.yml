@@ -1,6 +1,18 @@
+es_config_def:
+ cluster.name: "tester-cluster"
+ discovery.zen.ping.unicast.hosts: "{{ master_inventory }}"
+ network.host: 0.0.0.0
+ http.port: 9200
+ transport.tcp.port: 9300
+ node.data: true
+ node.master: false
+ xpack.monitoring.enabled: true
+ xpack.monitoring.collection.enabled: true
+ bootstrap.memory_lock: true
+######
 es_scripts: false
 es_templates: false
-es_version_lock: false
-#es_plugins: {}
-es_plugins:
- - plugin: ingest-attachment
+es_plugins: {}
+#es_plugins:
+# - plugin: ingest-attachment
+######

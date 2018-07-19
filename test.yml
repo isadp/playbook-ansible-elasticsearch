@@ -1,0 +1,26 @@
+---
+- hosts: data4
+  vars:
+   es_config_def:
+    cluster.name: 1
+    #discovery.zen.ping.unicast.hosts: "172.16.81.101"
+    #network.host: 0.0.0.0
+    #http.port: 9200
+    #transport.tcp.port: 9300
+    #node.data: true
+    #node.master: false
+    #xpack.monitoring.enabled: true
+    #xpack.monitoring.collection.enabled: true
+    #bootstrap.memory_lock: true
+   
+   es_config_extra:
+    cluster.name: 10
+
+   es_config: "{{ es_config_def | combine(es_config_extra, recursive=true) }}"
+
+  tasks:
+
+  - set_fact:
+  #- debug: msg="{{ es_config_all }}"
+  #- debug: msg="{{ es_config_spezial }}"
+  - debug: msg="{{ es_config }}"

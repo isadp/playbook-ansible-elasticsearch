@@ -15,4 +15,5 @@
        msg: "log_dir: {{ log_dir }}"
    - debug:
        msg: "data_dirs: {{ data_dirs }}"
-   
+   - debug:
+       msg: "es_version_lock: {{ es_version_lock }}"   
