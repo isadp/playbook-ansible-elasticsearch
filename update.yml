@@ -1,0 +1,68 @@
+---
+- hosts: data4
+  handlers:
+  - name: disable shard allocation
+    listen: stop elasticsearch
+    uri:
+     url: http://{{ ansible_default_ipv4.address }}:9200/_cluster/settings
+     method: PUT
+     body_format: json
+     body: "{\"persistent\":{\"cluster.routing.allocation.enable\":\"none\"}}"
+    register: result
+    until: result.json.acknowledged == true
+    retries: 5
+    delay: 3
+    changed_when: result.json.acknowledged == true
+
+  - name: stop es
+    listen: stop elasticsearch
+    service:
+     name: elasticsearch
+     state: stopped
+  
+  - name: wait es stopped
+    listen: stop elasticsearch
+    wait_for: host={{es_api_host}} port={{es_api_port}} delay=5 state=absent
+    changed_when: true
+    notify:
+     - start elasticsearch
+
+  - name: start es
+    listen: start elasticsearch
+    service:
+     name: elasticsearch
+     state: started
+
+  - name: wait es started
+    listen: start elasticsearch
+    wait_for: host={{es_api_host}} port={{es_api_port}} delay=5 state=present
+    changed_when: true
+    notify: test
+    #debug: msg="host={{es_api_host}} port={{es_api_port}}"
+
+  - name: enable shard allocation
+    listen: start elasticsearch
+    uri:
+     url: http://{{ ansible_default_ipv4.address }}:9200/_cluster/settings
+     method: PUT
+     body_format: json
+     body: "{\"persistent\":{\"cluster.routing.allocation.enable\":null}}"
+    register: result
+    until: result.json.acknowledged == true
+    retries: 5
+    delay: 3
+    changed_when: result.json.acknowledged == true
+  
+  - name: test
+    debug: msg="host={{es_api_host}} port={{es_api_port}}"
+
+  tasks:
+  - name: Check Elasticsearch in Update
+    command: "apt-get -u upgrade --assume-no"
+    register: aptupdate
+    failed_when: "'FAILED' in aptupdate.stderr"
+    #changed_when: "'elasticsearch' in aptupdate.stdout"
+    notify:
+     - stop elasticsearch
+     #- Start ES
+
