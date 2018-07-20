@@ -1,10 +1,10 @@
----
+--- 
 - hosts: data4
   handlers:
   - name: disable shard allocation
     listen: stop elasticsearch
     uri:
-     url: http://{{ ansible_default_ipv4.address }}:9200/_cluster/settings
+     url: http://{{ es_api_host }}:{{ es_api_port }}/_cluster/settings
      method: PUT
      body_format: json
      body: "{\"persistent\":{\"cluster.routing.allocation.enable\":\"none\"}}"
@@ -22,7 +22,7 @@
   
   - name: wait es stopped
     listen: stop elasticsearch
-    wait_for: host={{es_api_host}} port={{es_api_port}} delay=5 state=absent
+    wait_for: host={{ es_api_host }} port={{ es_api_port }} delay=5 state=absent
     changed_when: true
     notify:
      - start elasticsearch
@@ -35,15 +35,25 @@
 
   - name: wait es started
     listen: start elasticsearch
-    wait_for: host={{es_api_host}} port={{es_api_port}} delay=5 state=present
+    wait_for: host={{ es_api_host }} port={{ es_api_port }} delay=5 state=present
     changed_when: true
+
+  - name: wait for cluster
+    listen: start elasticsearch
+    uri:
+     url: http://{{ es_api_host }}:{{ es_api_port }}/_cat/nodes
+     method: GET
+     return_content: yes
+    register: get_result
+    until: get_result.content.find(es_api_host) != -1
+    retries: 30
+    delay: 3
     notify: test
-    #debug: msg="host={{es_api_host}} port={{es_api_port}}"
 
   - name: enable shard allocation
     listen: start elasticsearch
     uri:
-     url: http://{{ ansible_default_ipv4.address }}:9200/_cluster/settings
+     url: http://{{ es_api_host }}:{{ es_api_port }}/_cluster/settings
      method: PUT
      body_format: json
      body: "{\"persistent\":{\"cluster.routing.allocation.enable\":null}}"
@@ -52,9 +62,6 @@
     retries: 5
     delay: 3
     changed_when: result.json.acknowledged == true
-  
-  - name: test
-    debug: msg="host={{es_api_host}} port={{es_api_port}}"
 
   tasks:
   - name: Check Elasticsearch in Update
@@ -65,4 +72,5 @@
     notify:
      - stop elasticsearch
      #- Start ES
-
+   
+### wait for cluster joined und start if stopped implementieren
