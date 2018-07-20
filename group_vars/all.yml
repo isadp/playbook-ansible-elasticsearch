@@ -10,13 +10,14 @@ es_config_def:
  node.data: true
  node.master: false
  xpack.monitoring.enabled: true
- xpack.monitoring.collection.enabled: true
+ #xpack.monitoring.collection.enabled: true
  bootstrap.memory_lock: true
 ######
 es_plugins: {}
 #es_plugins:
 # - plugin: ingest-attachment
 ###### default/main.yml
+es_first_install: false
 es_major_version: "6.x"
 es_version: "6.3.1"
 es_use_snapshot_release: false

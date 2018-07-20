@@ -1,8 +1,13 @@
 --- 
 - hosts: data4
+#  vars:
+#   es_first_install: false
+
   handlers:
+  #- name: restart elasticsearch
+
   - name: disable shard allocation
-    listen: stop elasticsearch
+    listen: stop es
     uri:
      url: http://{{ es_api_host }}:{{ es_api_port }}/_cluster/settings
      method: PUT
@@ -13,33 +18,37 @@
     retries: 5
     delay: 3
     changed_when: result.json.acknowledged == true
+    when: not es_first_install
 
-  - name: stop es
-    listen: stop elasticsearch
+  - name: stop es service 
+    listen: stop es
     service:
      name: elasticsearch
      state: stopped
   
   - name: wait es stopped
-    listen: stop elasticsearch
+    listen: stop es
     wait_for: host={{ es_api_host }} port={{ es_api_port }} delay=5 state=absent
     changed_when: true
     notify:
-     - start elasticsearch
+     - start es
 
-  - name: start es
-    listen: start elasticsearch
+  - name: start es service 
+    listen: start es
     service:
      name: elasticsearch
      state: started
+     enabled: yes
+    register: es_restarted
 
   - name: wait es started
-    listen: start elasticsearch
+    listen: start es
     wait_for: host={{ es_api_host }} port={{ es_api_port }} delay=5 state=present
     changed_when: true
-
+    when: es_first_install
+   
   - name: wait for cluster
-    listen: start elasticsearch
+    listen: start es
     uri:
      url: http://{{ es_api_host }}:{{ es_api_port }}/_cat/nodes
      method: GET
@@ -48,10 +57,10 @@
     until: get_result.content.find(es_api_host) != -1
     retries: 30
     delay: 3
-    notify: test
-
+    when: not es_first_install
+ 
   - name: enable shard allocation
-    listen: start elasticsearch
+    listen: start es
     uri:
      url: http://{{ es_api_host }}:{{ es_api_port }}/_cluster/settings
      method: PUT
@@ -62,6 +71,19 @@
     retries: 5
     delay: 3
     changed_when: result.json.acknowledged == true
+    when: not es_first_install
+
+  - name: wait for cluster health
+    listen: start es
+    uri:
+     url: http://{{ es_api_host }}:{{ es_api_port }}/_cat/health
+     method: GET
+     return_content: yes
+    register: health_result
+    until: health_result.content.find("green") != -1
+    retries: 10000 
+    delay: 5
+    when: not es_first_install
 
   tasks:
   - name: Check Elasticsearch in Update
@@ -70,7 +92,11 @@
     failed_when: "'FAILED' in aptupdate.stderr"
     #changed_when: "'elasticsearch' in aptupdate.stdout"
     notify:
-     - stop elasticsearch
-     #- Start ES
-   
-### wait for cluster joined und start if stopped implementieren
+     - stop es
+  #- debug: msg="{{ es_first_install }}"
+  #- name: stopping  elasticsearch
+  #  service: name=elasticsearch state=stopped
+  
+
+### if stopped implementieren
+### es_fist_install neue Variable

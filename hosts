@@ -9,4 +9,4 @@ ma3 ansible_host=172.16.81.103
 data1 ansible_host=172.16.81.201
 data2 ansible_host=172.16.81.202
 data3 ansible_host=172.16.81.203
-data4 ansible_host=172.16.81.204
+#data4 ansible_host=172.16.81.204

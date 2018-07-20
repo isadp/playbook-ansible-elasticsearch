@@ -1,15 +1,7 @@
 ---
 - hosts: data4
   tasks:
-  - name: wait for cluster
-    listen: start elasticsearch
-    uri:
-     url: http://{{ es_api_host }}:{{ es_api_port }}/_cat/nodes
-     method: GET
-     #return_content: yes
-    register: get_result
-    #until: {{ es_api_host }} in get_result
-    #until: "'172.16.81.204' in get_result"
-    retries: 30
-    delay: 3
-  - debug: msg="{{ get_result }}"
+  - include: update.yml
+  - name: stopping  elasticsearch
+    service: name=elasticsearch state=stopped
+
